@@ -1,0 +1,118 @@
+
+service: ${file(config.yml):service}
+
+provider:
+  name: aws
+  region: ${file(config.yml):region}
+  runtime: nodejs8.10
+  stage: ${file(config.yml):stage}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:*"
+      Resource: '*'
+  memorySize: 128
+  versionFunctions: false
+  environment:
+      SERVICETABLENAME: ${self:custom.serviceTableName}
+      VERSIONTABLENAME: ${self:custom.versionTableName}
+      LAMBDACACHE : true # NOTE! true is String => 'true'
+
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
+  - serverless-go-build
+
+frameworkVersion: ">=1.28.0 <2.0.0"
+
+
+custom:
+  serviceTableName: ${self:service}-${self:provider.stage}-swagger-dynamo-serviceinfo
+  versionTableName: ${self:service}-${self:provider.stage}-swagger-dynamo-versioninfo
+  dynamodb:
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+      seed: true
+    seed:
+      development:
+        sources:
+          - table: ${self:provider.environment.SERVICETABLENAME}
+            sources:
+              - ./db/serviceinfo.local.json
+          - table: ${self:provider.environment.VERSIONTABLENAME}
+            sources:
+              - ./db/versioninfo.local.json
+
+package:
+  individually: true
+
+functions:
+  # hello:
+  #   handler: hello/handler.go
+  #   events:
+  #     - http:
+  #         path: hello
+  #         method: get
+  # world:
+  #   handler: world/handler.go
+  #   events:
+  #     - http:
+  #         path: world
+  #         method: get
+
+  getService:
+    handler: src/getService.go
+    events:
+      - http:
+          path: service/{id}
+          method: get
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+
+
+
+resources:
+  Resources:
+    ServiceInfoDynamoDB:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        TableName: ${self:custom.serviceTableName}
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    VersionInfoDynamoDB:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        TableName: ${self:custom.versionTableName}
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+          -
+            AttributeName: version
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+          -
+            AttributeName: version
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1

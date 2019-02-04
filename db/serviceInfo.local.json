@@ -1,0 +1,21 @@
+[
+    { 
+        "id": "7876153a-da82-36a2-8c48-647e87674701",
+        "servicename": "audit",
+        "latestversion": "1.0.0",
+        "lastupdated": 1544696787365,
+        "dynamolocal": true
+    },{ 
+        "id": "66a36e77-fd00-3779-8097-17841f998f4d",
+        "servicename": "auth",
+        "latestversion": "1.0.0",
+        "lastupdated": 1544696787365,
+        "dynamolocal": true
+    },{ 
+        "id": "524f25fe-b711-3ae8-b7b8-93fffaaeb4e0",
+        "servicename": "ess",
+        "latestversion": "1.0.0",
+        "lastupdated": 1544696787365,
+        "dynamolocal": true
+    }
+]

@@ -1,0 +1,45 @@
+[
+    {
+        "id": "7876153a-da82-36a2-8c48-647e87674701",
+        "version": "1.52.100",
+        "path": "swagger/audit/swagger1_52_100.yaml",
+        "lastupdated": 1544696787367,
+        "dynamolocal": true
+    },{ 
+        "id": "7876153a-da82-36a2-8c48-647e87674701",
+        "version": "2.20.1",
+        "path": "swagger/audit/swagger2_20_1.yaml",
+        "lastupdated": 1544696787367,
+        "dynamolocal": true
+    },{ 
+        "id": "7876153a-da82-36a2-8c48-647e87674701",
+        "version": "3.0.0",
+        "path": "swagger/audit/swagger3_0_0.yaml",
+        "lastupdated": 1544696787367,
+        "dynamolocal": true
+    },{ 
+        "id": "66a36e77-fd00-3779-8097-17841f998f4d",
+        "version": "0.0.1",
+        "path": "swagger/auth/swagger0_0_1.yaml",
+        "lastupdated": 1544696787367,
+        "dynamolocal": true
+    },{ 
+        "id": "66a36e77-fd00-3779-8097-17841f998f4d",
+        "version": "0.0.2",
+        "path": "swagger/auth/swagger0_0_2.yaml",
+        "lastupdated": 1544696787367,
+        "dynamolocal": true
+    },{ 
+        "id": "66a36e77-fd00-3779-8097-17841f998f4d",
+        "version": "1.0.0",
+        "path": "swagger/auth/swagger1_0_0.yaml",
+        "lastupdated": 1544696787367,
+        "dynamolocal": true
+    },{ 
+        "id": "524f25fe-b711-3ae8-b7b8-93fffaaeb4e0",
+        "version": "2.0.0",
+        "path": "swagger/ess/swagger2_0_0.yaml",
+        "lastupdated": 1544696787367,
+        "dynamolocal": true
+    }
+]
