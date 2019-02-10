@@ -8,6 +8,9 @@ import (
   "github.com/aws/aws-sdk-go-v2/service/dynamodb/dynamodbattribute"
 )
 
+
+
+
 type ServiceEntity struct {
   Id			string `json:"id"`
   Servicename	string `json:"servicename"`
@@ -24,13 +27,9 @@ type ServiceRepositoryDao interface {
 }
 
 type ServiceRepositoryDaoImpl struct {
-  serviceRepositoryDao ServiceRepositoryDao
   tableName string
 	dynamoClient *dynamodb.DynamoDB
 }
-
-
-
 
 
 
@@ -43,10 +42,8 @@ func NewDaoDefaultConfig(tableName string)(*ServiceRepositoryDaoImpl, error) {
 	}
 
   return &ServiceRepositoryDaoImpl{
-    serviceRepositoryDao: &ServiceRepositoryDaoImpl{
-      dynamoClient: dynamodb.New(cfg),
-		  tableName: tableName,
-    },
+    dynamoClient: dynamodb.New(cfg),
+		tableName: tableName,
 	}, nil
 }
 
@@ -59,10 +56,8 @@ func NewDaoWithRegion(tableName string, region string)(*ServiceRepositoryDaoImpl
 	}
 
   return &ServiceRepositoryDaoImpl{
-    serviceRepositoryDao: &ServiceRepositoryDaoImpl{
-      dynamoClient: dynamodb.New(cfg),
-		  tableName: tableName,
-    },
+    dynamoClient: dynamodb.New(cfg),
+		tableName: tableName,
 	}, nil
 }
 
@@ -76,10 +71,8 @@ func NewDaoWithRegionAndEndpoint(tableName string, region string, endpoint strin
 	}
 
   return &ServiceRepositoryDaoImpl{
-    serviceRepositoryDao: &ServiceRepositoryDaoImpl{
-      dynamoClient: dynamodb.New(cfg),
-		  tableName: tableName,
-    },
+    dynamoClient: dynamodb.New(cfg),
+		tableName: tableName,
 	}, nil
 }
 

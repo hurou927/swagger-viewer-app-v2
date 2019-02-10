@@ -6,6 +6,9 @@ import (
     "os"
 )
 
+
+
+
 func TestGetServicies (t *testing.T) {
 	os.Setenv("AWS_DEFAULT_REGION","ap-northeast-1")
 	os.Setenv("SERVICETABLENAME", "swagger-dev-swagger-dynamo-serviceinfo")
@@ -15,11 +18,9 @@ func TestGetServicies (t *testing.T) {
 		t.Fatalf("failed test %#v", err)
 	}
 
-	servicies, err := dao.serviceRepositoryDao.GetServiceList();
+	servicies, err := dao.GetServiceList();
 	if err != nil {
 		t.Fatalf("failed test %#v", err)
 	}
-
 	t.Log(servicies);
-
 }
