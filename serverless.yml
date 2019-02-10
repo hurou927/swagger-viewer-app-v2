@@ -4,7 +4,7 @@ service: ${file(config.yml):service}
 provider:
   name: aws
   region: ${file(config.yml):region}
-  runtime: nodejs8.10
+  runtime: go1.x
   stage: ${file(config.yml):stage}
   iamRoleStatements:
     - Effect: "Allow"
@@ -49,18 +49,6 @@ package:
   individually: true
 
 functions:
-  # hello:
-  #   handler: hello/handler.go
-  #   events:
-  #     - http:
-  #         path: hello
-  #         method: get
-  # world:
-  #   handler: world/handler.go
-  #   events:
-  #     - http:
-  #         path: world
-  #         method: get
 
   getService:
     handler: src/getService.go

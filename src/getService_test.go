@@ -4,13 +4,14 @@ import (
     "fmt"
     "testing"
     "os"
-    "github.com/swagger-viewer/swagger-viewer-app-v2/src/lib"
+    "github.com/swagger-viewer/swagger-viewer-app-v2/lib/common"
     "context"
 )
 
 
 
 func TestHandlerSuccess(t *testing.T) {
+
     os.Setenv("AWS_DEFAULT_REGION","ap-northeast-1")
     os.Setenv("SERVICETABLENAME", "swagger-dev-swagger-dynamo-serviceinfo")
     body := map[string] interface{} {}
@@ -35,6 +36,7 @@ func TestHandlerSuccess(t *testing.T) {
 
 
 func TestHandlerFailure(t *testing.T) {
+    
     os.Setenv("AWS_DEFAULT_REGION","ap-northeast-1")
     os.Setenv("SERVICETABLENAME", "swagger-dev-swagger-dynamo-serviceinfo")
     body := map[string] interface{} {}

@@ -8,6 +8,7 @@ import (
   "github.com/aws/aws-sdk-go-v2/service/dynamodb/dynamodbattribute"
 )
 
+
 type Dto struct {
   Id			string `json:"id"`
   Servicename	string `json:"servicename"`
@@ -19,6 +20,10 @@ type Dao struct {
 	tableName string
 	dynamoClient *dynamodb.DynamoDB
 }
+
+
+
+
 
 func NewDaoDefaultConfig(tableName string)(*Dao, error) {
 	cfg, err := external.LoadDefaultAWSConfig()
@@ -64,14 +69,14 @@ func NewDaoWithRegionAndEndpoint(tableName string, region string, endpoint strin
 
 
 
-func (this *Dao) GetService (userId string) (*Dto, error) {
+func (this *Dao) GetService (servicId string) (*Dto, error) {
   if this == nil {
-    return &Dto{}, fmt.Errorf("nil pointer receiver")
+    return nil, fmt.Errorf("nil pointer receiver")
   }
 	result, err  := this.dynamoClient.GetItemRequest(&dynamodb.GetItemInput{
 	  Key: map[string]dynamodb.AttributeValue{
 	    "id": {
-	      S: aws.String(userId),
+	      S: aws.String(servicId),
 	    },
 	  },
 	  TableName: aws.String(this.tableName),
@@ -80,13 +85,12 @@ func (this *Dao) GetService (userId string) (*Dto, error) {
   if err != nil{
     return nil, err
   }
-  
 
   if result.Item == nil {
     return nil, nil
   }
 
-  // fmt.Printf("%+v\n", result)
+
   dto := Dto{}
   if err := dynamodbattribute.UnmarshalMap(result.Item, &dto); err!= nil{
     return &Dto{}, err
@@ -96,18 +100,47 @@ func (this *Dao) GetService (userId string) (*Dto, error) {
 
 
 
-func (this *Dao) PostServices (dtos []Dto) ([]Dto, error) {
+func (this *Dao) GetServiceList () ([]Dto, error) {
+  if this == nil {
+    return nil, fmt.Errorf("nil pointer receiver")
+  }
+  req := this.dynamoClient.ScanRequest(&dynamodb.ScanInput{
+    TableName: aws.String(this.tableName),
+  })
+  p := req.Paginate()
+
+	var items []map[string] dynamodb.AttributeValue
+  for p.Next() {
+		page := p.CurrentPage()
+    items = append(items, page.Items ...)
+	}
+  if err := p.Err(); err != nil {
+		return nil, err
+  }
+
+	var servicies []Dto
+	if err := dynamodbattribute.UnmarshalListOfMaps(items, &servicies); err!= nil{
+    	return nil, err
+  }
+
+	return servicies, nil
+
+}
+
+
+
+func (this *Dao) PostServices (services []Dto) ([]Dto, error) {
   if this == nil {
     return nil, fmt.Errorf("nil pointer receiver")
   }
 
-  UnprocessedItems := make([]Dto, len(dtos), len(dtos))
+  UnprocessedItems := make([]Dto, len(services), len(services))
 
-  for index := range dtos {
-    item, err := dynamodbattribute.MarshalMap(dtos[index])
+  for index := range services {
+    item, err := dynamodbattribute.MarshalMap(services[index])
     if err != nil {
       fmt.Println(err)
-      UnprocessedItems[0] = dtos[index]
+      UnprocessedItems[0] = services[index]
       continue;
     } 
     result, err := this.dynamoClient.PutItemRequest(&dynamodb.PutItemInput{
@@ -122,7 +155,7 @@ func (this *Dao) PostServices (dtos []Dto) ([]Dto, error) {
 
     if err != nil {
       fmt.Println(err)
-      UnprocessedItems[0] = dtos[index]
+      UnprocessedItems[0] = services[index]
       continue;
     }
 
@@ -130,3 +163,6 @@ func (this *Dao) PostServices (dtos []Dto) ([]Dto, error) {
   }
   return UnprocessedItems, nil
 }
+
+
+// func (this *Dao) UpdateService (servicie Dto) ()

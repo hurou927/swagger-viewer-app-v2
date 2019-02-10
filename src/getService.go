@@ -8,7 +8,7 @@ import (
 	"os"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/swagger-viewer/swagger-viewer-app-v2/src/sub"
+	"github.com/swagger-viewer/swagger-viewer-app-v2/lib/db"
 )
 
 type ErrorElm struct {
@@ -21,26 +21,10 @@ type ErrorBody struct {
 }
 
 
-func CreateErrorResponse(statusCode int, errorBody ErrorBody)(events.APIGatewayProxyResponse) {
+func CreateErrorResponse(statusCode int, errorBody ErrorBody)(events.APIGatewayProxyResponse, error) {
 	body, err := json.Marshal(errorBody)
 	if err != nil {
-		body, _ := json.Marshal(ErrorBody{
-			Error: ErrorElm{
-				Code: 501,
-				Message: "CreateResponseError", 
-			},
-		})
-		var buf bytes.Buffer
-		json.HTMLEscape(&buf, body)
-		resp := events.APIGatewayProxyResponse {
-				StatusCode:      500,
-				IsBase64Encoded: false,
-				Body:            buf.String(),
-				Headers: map[string]string{
-				"Content-Type": "application/json; charset=utf-8",
-			},
-		}
-		return resp
+		return events.APIGatewayProxyResponse{}, err
 	}
 	var buf bytes.Buffer
 	json.HTMLEscape(&buf, body)
@@ -53,13 +37,25 @@ func CreateErrorResponse(statusCode int, errorBody ErrorBody)(events.APIGatewayP
 			"Content-Type": "application/json; charset=utf-8",
 		},
 	}
-	return resp
+	return resp, nil
 }
 
+var a int = 4
 
 func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	
+
+	fmt.Println(a)	
 	serviceDao, err := servicedb.NewDaoDefaultConfig(os.Getenv("SERVICETABLENAME"));
+
+	if err != nil {
+		return CreateErrorResponse(500, ErrorBody {
+			Error: ErrorElm {
+				Code: 400,
+				Message: "DynamoClientError",
+			},
+		})
+	}
+
 
   	serviceDto, err := serviceDao.GetService(request.PathParameters["id"]);
 
