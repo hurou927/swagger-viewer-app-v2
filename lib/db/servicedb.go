@@ -8,16 +8,24 @@ import (
   "github.com/aws/aws-sdk-go-v2/service/dynamodb/dynamodbattribute"
 )
 
-
-type Dto struct {
+type ServiceEntity struct {
   Id			string `json:"id"`
   Servicename	string `json:"servicename"`
   Latestversion	string `json:"latestversion"`
   Lastupdated	int64  `json:"lastupdated"`
 }
 
-type Dao struct {
-	tableName string
+
+
+type ServiceRepositoryDao interface {
+  GetService (servicId string) (*ServiceEntity, error)
+  GetServiceList () ([]ServiceEntity, error)
+  PostServices (services []ServiceEntity) ([]ServiceEntity, error)
+}
+
+type ServiceRepositoryDaoImpl struct {
+  serviceRepositoryDao ServiceRepositoryDao
+  tableName string
 	dynamoClient *dynamodb.DynamoDB
 }
 
@@ -25,51 +33,59 @@ type Dao struct {
 
 
 
-func NewDaoDefaultConfig(tableName string)(*Dao, error) {
+
+
+func NewDaoDefaultConfig(tableName string)(*ServiceRepositoryDaoImpl, error) {
 	cfg, err := external.LoadDefaultAWSConfig()
   cfg.DisableEndpointHostPrefix = true
 	if err != nil {
-		return &Dao{}, err
+		return &ServiceRepositoryDaoImpl{}, err
 	}
 
-  	return &Dao{
-			dynamoClient: dynamodb.New(cfg),
-			tableName: tableName,
+  return &ServiceRepositoryDaoImpl{
+    serviceRepositoryDao: &ServiceRepositoryDaoImpl{
+      dynamoClient: dynamodb.New(cfg),
+		  tableName: tableName,
+    },
 	}, nil
 }
 
-func NewDaoWithRegion(tableName string, region string)(*Dao, error) {
+func NewDaoWithRegion(tableName string, region string)(*ServiceRepositoryDaoImpl, error) {
 	cfg, err := external.LoadDefaultAWSConfig()
   	cfg.Region = region
   	cfg.DisableEndpointHostPrefix = true
   	if err != nil {
-		return &Dao{}, err
+		return &ServiceRepositoryDaoImpl{}, err
 	}
 
-  	return &Dao{
-			dynamoClient: dynamodb.New(cfg),
-			tableName: tableName,
+  return &ServiceRepositoryDaoImpl{
+    serviceRepositoryDao: &ServiceRepositoryDaoImpl{
+      dynamoClient: dynamodb.New(cfg),
+		  tableName: tableName,
+    },
 	}, nil
 }
 
-func NewDaoWithRegionAndEndpoint(tableName string, region string, endpoint string)(*Dao, error) {
+func NewDaoWithRegionAndEndpoint(tableName string, region string, endpoint string)(*ServiceRepositoryDaoImpl, error) {
 	cfg, err := external.LoadDefaultAWSConfig()
 	cfg.EndpointResolver = aws.ResolveWithEndpointURL(endpoint)
   	cfg.Region = region
   	cfg.DisableEndpointHostPrefix = true
   	if err != nil {
-		return &Dao{}, err
+		return &ServiceRepositoryDaoImpl{}, err
 	}
 
-  	return &Dao{
-			dynamoClient: dynamodb.New(cfg),
-			tableName: tableName,
+  return &ServiceRepositoryDaoImpl{
+    serviceRepositoryDao: &ServiceRepositoryDaoImpl{
+      dynamoClient: dynamodb.New(cfg),
+		  tableName: tableName,
+    },
 	}, nil
 }
 
 
 
-func (this *Dao) GetService (servicId string) (*Dto, error) {
+func (this *ServiceRepositoryDaoImpl) GetService (servicId string) (*ServiceEntity, error) {
   if this == nil {
     return nil, fmt.Errorf("nil pointer receiver")
   }
@@ -91,16 +107,16 @@ func (this *Dao) GetService (servicId string) (*Dto, error) {
   }
 
 
-  dto := Dto{}
-  if err := dynamodbattribute.UnmarshalMap(result.Item, &dto); err!= nil{
-    return &Dto{}, err
+  entity := ServiceEntity{}
+  if err := dynamodbattribute.UnmarshalMap(result.Item, &entity); err!= nil{
+    return &ServiceEntity{}, err
   }
-  return &dto, nil
+  return &entity, nil
 }
 
 
 
-func (this *Dao) GetServiceList () ([]Dto, error) {
+func (this *ServiceRepositoryDaoImpl) GetServiceList () ([]ServiceEntity, error) {
   if this == nil {
     return nil, fmt.Errorf("nil pointer receiver")
   }
@@ -118,7 +134,7 @@ func (this *Dao) GetServiceList () ([]Dto, error) {
 		return nil, err
   }
 
-	var servicies []Dto
+	var servicies []ServiceEntity
 	if err := dynamodbattribute.UnmarshalListOfMaps(items, &servicies); err!= nil{
     	return nil, err
   }
@@ -129,12 +145,12 @@ func (this *Dao) GetServiceList () ([]Dto, error) {
 
 
 
-func (this *Dao) PostServices (services []Dto) ([]Dto, error) {
+func (this *ServiceRepositoryDaoImpl) PostServices (services []ServiceEntity) ([]ServiceEntity, error) {
   if this == nil {
     return nil, fmt.Errorf("nil pointer receiver")
   }
 
-  UnprocessedItems := make([]Dto, len(services), len(services))
+  UnprocessedItems := make([]ServiceEntity, len(services), len(services))
 
   for index := range services {
     item, err := dynamodbattribute.MarshalMap(services[index])
