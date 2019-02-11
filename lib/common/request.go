@@ -1,15 +1,16 @@
-package request
+package common
 
 import (
 	"encoding/json"
+
 	"github.com/aws/aws-lambda-go/events"
 )
 
 func CreateProxyRequest(
-    body map[string] interface{}, 
-    queryStringParameters map[string] string, 
-    pathParameters map[string] string ) (events.APIGatewayProxyRequest, error) {
-    defaultRequest:= `
+	body map[string]interface{},
+	queryStringParameters map[string]string,
+	pathParameters map[string]string) (events.APIGatewayProxyRequest, error) {
+	defaultRequest := `
 {
     "resource": "/",
     "path": "/",
@@ -70,16 +71,16 @@ func CreateProxyRequest(
 }
 	`
 	var obj events.APIGatewayProxyRequest
-    err := json.Unmarshal([]byte(defaultRequest), &obj)
-    if err != nil {
-        return obj, nil
-    }
-    obj.QueryStringParameters = queryStringParameters;
-    obj.PathParameters = pathParameters;
-    stringifiedBody, err := json.Marshal(body)
-    if err != nil {
-        return obj, nil
-    }
-    obj.Body = string(stringifiedBody)
+	err := json.Unmarshal([]byte(defaultRequest), &obj)
+	if err != nil {
+		return obj, nil
+	}
+	obj.QueryStringParameters = queryStringParameters
+	obj.PathParameters = pathParameters
+	stringifiedBody, err := json.Marshal(body)
+	if err != nil {
+		return obj, nil
+	}
+	obj.Body = string(stringifiedBody)
 	return obj, nil
 }

@@ -157,12 +157,12 @@ func (this *serviceRepositoryDaoImpl) GetServiceList() ([]ServiceEntity, error) 
 		return nil, err
 	}
 
-	var servicies []ServiceEntity
-	if err := dynamodbattribute.UnmarshalListOfMaps(items, &servicies); err != nil {
+	var services []ServiceEntity
+	if err := dynamodbattribute.UnmarshalListOfMaps(items, &services); err != nil {
 		return nil, err
 	}
 
-	return servicies, nil
+	return services, nil
 
 }
 

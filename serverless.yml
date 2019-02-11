@@ -19,6 +19,8 @@ provider:
       LAMBDACACHE : true # NOTE! true is String => 'true'
 
 plugins:
+  - serverless-reqvalidator-plugin
+  - serverless-aws-documentation
   - serverless-dynamodb-local
   - serverless-offline
   - serverless-go-build
@@ -29,6 +31,35 @@ frameworkVersion: ">=1.28.0 <2.0.0"
 custom:
   serviceTableName: ${self:service}-${self:provider.stage}-swagger-dynamo-serviceinfo
   versionTableName: ${self:service}-${self:provider.stage}-swagger-dynamo-versioninfo
+  documentation:
+    api:
+      info:
+        version: '1.0.0'
+        title: Swagger API
+        description: This is my API
+      tags:
+        -
+          name: Swagger
+          description: Service Management
+      
+    models:
+
+      - name: ServiceEntityRequest
+        contentType: "application/json"
+        schema:
+          required: 
+            - servicename
+            - latestversion
+            - lastupdated
+          properties:
+            servicename:
+              type: string
+            latestversion:
+              type: string
+            lastupdated:
+              type: number
+
+
   dynamodb:
     start:
       port: 8000
@@ -51,11 +82,68 @@ package:
 functions:
 
   getService:
-    handler: src/getService.go
+    handler: src/getService/main.go
     events:
       - http:
-          path: service/{id}
+          path: services/{id}
           method: get
+          cors: true
+          reqValidatorName: onlyParameter
+          request:
+            parameters:
+              paths:
+                id: true
+
+  getServiceList:
+    handler: src/getServiceList/main.go
+    events:
+      - http:
+          path: services
+          method: get
+          cors: true
+            
+  deleteService:
+    handler: src/deleteService/main.go
+    events:
+      - http:
+          path: services/{id}
+          method: delete
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+
+  createService:
+    handler: src/createService/main.go
+    events:
+      - http:
+          path: services
+          method: post
+          cors: true
+          reqValidatorName: onlyBody
+          # documentation:
+          #   summary: "Create Service Record"
+          #   description: "Create Service Record"
+          #   tags:
+          #     - Service
+          #   requestModels:
+          #     "application/json": ServiceEntity
+          documentation:
+            summary: "Register user"
+            description: "Registers new user"
+            tags:
+              - User
+            requestModels:
+              "application/json": ServiceEntityRequest
+            
+
+  updateService:
+    handler: src/updateService/main.go
+    events:
+      - http:
+          path: services/{id}
+          method: put
           cors: true
           request:
             parameters:
@@ -66,6 +154,35 @@ functions:
 
 resources:
   Resources:
+    onlyBody:  
+      Type: "AWS::ApiGateway::RequestValidator"
+      Properties:
+        Name: 'only-body'
+        RestApiId: 
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: false
+    
+    onlyParameter:  
+      Type: "AWS::ApiGateway::RequestValidator"
+      Properties:
+        Name: 'only-parameter'
+        RestApiId: 
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: false
+        ValidateRequestParameters: true
+
+    BodyParameter:  
+      Type: "AWS::ApiGateway::RequestValidator"
+      Properties:
+        Name: 'body-and-parameter'
+        RestApiId: 
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: true
+
+
+
     ServiceInfoDynamoDB:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Retain
