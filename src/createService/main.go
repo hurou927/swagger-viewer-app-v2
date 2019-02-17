@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"os"
@@ -26,7 +25,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 
 	// serviceDao, err := servicedb.NewDaoDefaultConfig(os.Getenv("SERVICETABLENAME"))
 
-	// todo: dupulicate ServiceName Check
+	// todo: duplicate ServiceName Check
 	if serviceInitError != nil {
 		return common.CreateErrorResponse(500, common.ErrorBody{
 			Error: common.ErrorElm{
@@ -72,9 +71,8 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		})
 	}
 
-	body, err := json.Marshal(map[string]interface{}{
-		"item": requestEntity,
-	})
+	resp, err := common.CreateResponse(200, requestEntity)
+
 	if err != nil {
 		return common.CreateErrorResponse(500, common.ErrorBody{
 			Error: common.ErrorElm{
@@ -82,18 +80,6 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 				Message: "Internal Error",
 			},
 		})
-	}
-
-	var buf bytes.Buffer
-	json.HTMLEscape(&buf, body)
-
-	resp := events.APIGatewayProxyResponse{
-		StatusCode:      200,
-		IsBase64Encoded: false,
-		Body:            buf.String(),
-		Headers: map[string]string{
-			"Content-Type": "application/json; charset=utf-8",
-		},
 	}
 
 	return resp, nil

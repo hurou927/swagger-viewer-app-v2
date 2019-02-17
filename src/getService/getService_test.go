@@ -10,12 +10,14 @@ import (
 	servicedb "github.com/swagger-viewer/swagger-viewer-app-v2/lib/db"
 )
 
+var dynamoLocalEndpoint string = "http://localhost:8027"
+
 func TestHandlerSuccess(t *testing.T) {
 
 	os.Setenv("AWS_DEFAULT_REGION", "ap-northeast-1")
 	os.Setenv("SERVICETABLENAME", "swagger-dev-swagger-dynamo-serviceinfo")
 
-	serviceDao, serviceInitError = servicedb.NewDaoWithRegionAndEndpoint(os.Getenv("SERVICETABLENAME"), os.Getenv("AWS_DEFAULT_REGION"), "http://localhost:8000")
+	serviceDao, serviceInitError = servicedb.NewDaoWithRegionAndEndpoint(os.Getenv("SERVICETABLENAME"), os.Getenv("AWS_DEFAULT_REGION"), dynamoLocalEndpoint)
 
 	body := map[string]interface{}{}
 	queryParams := map[string]string{}
@@ -41,7 +43,7 @@ func TestHandlerFailure(t *testing.T) {
 	os.Setenv("AWS_DEFAULT_REGION", "ap-northeast-1")
 	os.Setenv("SERVICETABLENAME", "swagger-dev-swagger-dynamo-serviceinfo")
 
-	serviceDao, serviceInitError = servicedb.NewDaoWithRegionAndEndpoint(os.Getenv("SERVICETABLENAME"), os.Getenv("AWS_DEFAULT_REGION"), "http://localhost:8000")
+	serviceDao, serviceInitError = servicedb.NewDaoWithRegionAndEndpoint(os.Getenv("SERVICETABLENAME"), os.Getenv("AWS_DEFAULT_REGION"), dynamoLocalEndpoint)
 
 	body := map[string]interface{}{}
 	queryParams := map[string]string{}

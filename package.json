@@ -2,7 +2,8 @@
   "scripts": {
     "showdb": "node scripts/showDynamoDBLocal.js",
     "offline": "sls offline start",
-    "deploy": "sls build && sls deploy"
+    "deploy": "sls build && sls deploy",
+    "rm-offline": "sudo lsof -i:3027  -t | xargs -I {} kill -KILL {} && sudo lsof -i:8027  -t | xargs -I {} kill -KILL {}"
   },
   "devDependencies": {
     "aws-sdk": "^2.395.0",

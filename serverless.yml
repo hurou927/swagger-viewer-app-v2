@@ -59,10 +59,12 @@ custom:
             lastupdated:
               type: number
 
+  serverless-offline:
+    port: 3027
 
   dynamodb:
     start:
-      port: 8000
+      port: 8027
       inMemory: true
       migrate: true
       seed: true
@@ -150,6 +152,18 @@ functions:
               paths:
                 id: true
 
+  getAllVersions:
+    handler: src/getAllVersions/main.go
+    events:
+      - http:
+          path: versions/{id}
+          method: get
+          cors: true
+          reqValidatorName: onlyParameter
+          request:
+            parameters:
+              paths:
+                id: true
 
 
 resources:
@@ -181,6 +195,40 @@ resources:
         ValidateRequestBody: true
         ValidateRequestParameters: true
 
+
+    GatewayResponseDefault4XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "method.request.header.origin"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Credentials: "'true'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+    GatewayResponseACCESSDENIED:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "method.request.header.origin"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Credentials: "'true'"
+        ResponseType: ACCESS_DENIED
+        ResponseTemplates:
+          'application/json': |
+            {"error": $context.authorizer.authorizeError,"message":$context.error.messageString}
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+    GatewayResponseDefault5XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "method.request.header.origin"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Credentials: "'true'"
+        ResponseType: DEFAULT_5XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
 
 
     ServiceInfoDynamoDB:

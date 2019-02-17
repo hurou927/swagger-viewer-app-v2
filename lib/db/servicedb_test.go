@@ -2,32 +2,35 @@ package servicedb
 
 import (
 	// "fmt"
+
 	"os"
 	"testing"
 )
 
-func TestGetServiciesSuccess(t *testing.T) {
-	os.Setenv("AWS_DEFAULT_REGION", "ap-northeast-1")
-	os.Setenv("SERVICETABLENAME", "swagger-dev-swagger-dynamo-serviceinfo")
+var dynamoLocalEndpoint string = "http://localhost:8027"
 
-	dao, err := NewDaoWithRegionAndEndpoint(os.Getenv("SERVICETABLENAME"), os.Getenv("AWS_DEFAULT_REGION"), "http://localhost:8000")
-	// dao, err := NewDaoDefaultConfig(os.Getenv("SERVICETABLENAME"));
-	if err != nil {
-		t.Fatalf("failed test %#v", err)
-	}
+// func TestGetServiciesSuccess(t *testing.T) {
+// 	os.Setenv("AWS_DEFAULT_REGION", "ap-northeast-1")
+// 	os.Setenv("SERVICETABLENAME", "swagger-dev-swagger-dynamo-serviceinfo")
 
-	servicies, err := dao.GetServiceList()
-	if err != nil {
-		t.Fatalf("failed test %#v", err)
-	}
-	t.Log(servicies)
-}
+// 	dao, err := NewDaoWithRegionAndEndpoint(os.Getenv("SERVICETABLENAME"), os.Getenv("AWS_DEFAULT_REGION"), dynamoLocalEndpoint)
+// 	// dao, err := NewDaoDefaultConfig(os.Getenv("SERVICETABLENAME"));
+// 	if err != nil {
+// 		t.Fatalf("failed test %#v", err)
+// 	}
+
+// 	servicies, err := dao.GetServiceList()
+// 	if err != nil {
+// 		t.Fatalf("failed test %#v", err)
+// 	}
+// 	t.Log(servicies)
+// }
 
 func TestGetServiceSuccess(t *testing.T) {
 	os.Setenv("AWS_DEFAULT_REGION", "ap-northeast-1")
 	os.Setenv("SERVICETABLENAME", "swagger-dev-swagger-dynamo-serviceinfo")
 
-	dao, err := NewDaoWithRegionAndEndpoint(os.Getenv("SERVICETABLENAME"), os.Getenv("AWS_DEFAULT_REGION"), "http://localhost:8000")
+	dao, err := NewDaoWithRegionAndEndpoint(os.Getenv("SERVICETABLENAME"), os.Getenv("AWS_DEFAULT_REGION"), dynamoLocalEndpoint)
 	// dao, err := NewDaoDefaultConfig(os.Getenv("SERVICETABLENAME"));
 	if err != nil {
 		t.Fatalf("failed test %#v", err)
@@ -48,7 +51,7 @@ func TestGetServiceShouldReturnNil(t *testing.T) {
 	os.Setenv("AWS_DEFAULT_REGION", "ap-northeast-1")
 	os.Setenv("SERVICETABLENAME", "swagger-dev-swagger-dynamo-serviceinfo")
 
-	dao, err := NewDaoWithRegionAndEndpoint(os.Getenv("SERVICETABLENAME"), os.Getenv("AWS_DEFAULT_REGION"), "http://localhost:8000")
+	dao, err := NewDaoWithRegionAndEndpoint(os.Getenv("SERVICETABLENAME"), os.Getenv("AWS_DEFAULT_REGION"), dynamoLocalEndpoint)
 	if err != nil {
 		t.Fatalf("failed test %#v", err)
 	}
@@ -68,7 +71,7 @@ func TestUpdateServiceSuccess(t *testing.T) {
 	os.Setenv("AWS_DEFAULT_REGION", "ap-northeast-1")
 	os.Setenv("SERVICETABLENAME", "swagger-dev-swagger-dynamo-serviceinfo")
 
-	dao, err := NewDaoWithRegionAndEndpoint(os.Getenv("SERVICETABLENAME"), os.Getenv("AWS_DEFAULT_REGION"), "http://localhost:8000")
+	dao, err := NewDaoWithRegionAndEndpoint(os.Getenv("SERVICETABLENAME"), os.Getenv("AWS_DEFAULT_REGION"), dynamoLocalEndpoint)
 	if err != nil {
 		t.Fatalf("failed test %#v", err)
 	}
@@ -85,7 +88,7 @@ func TestUpdateServiceSuccess(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed test %#v", err)
 	}
-	t.Logf("%+v\n", result)
+
 	if result.Id != id {
 		t.Fatalf("incorrect id")
 	}
@@ -101,7 +104,7 @@ func TestUpdateServiceNoUpdateShouldReturnError(t *testing.T) {
 	os.Setenv("AWS_DEFAULT_REGION", "ap-northeast-1")
 	os.Setenv("SERVICETABLENAME", "swagger-dev-swagger-dynamo-serviceinfo")
 
-	dao, err := NewDaoWithRegionAndEndpoint(os.Getenv("SERVICETABLENAME"), os.Getenv("AWS_DEFAULT_REGION"), "http://localhost:8000")
+	dao, err := NewDaoWithRegionAndEndpoint(os.Getenv("SERVICETABLENAME"), os.Getenv("AWS_DEFAULT_REGION"), dynamoLocalEndpoint)
 	if err != nil {
 		t.Fatalf("failed test %#v", err)
 	}
@@ -114,13 +117,14 @@ func TestUpdateServiceNoUpdateShouldReturnError(t *testing.T) {
 	if err == nil {
 		t.Fatalf("should return error %#v", result)
 	}
+	// t.Logf("%+v", err.Error())
 }
 
 func TestUpdateServiceIncorrectIdShouldReturnError(t *testing.T) {
 	os.Setenv("AWS_DEFAULT_REGION", "ap-northeast-1")
 	os.Setenv("SERVICETABLENAME", "swagger-dev-swagger-dynamo-serviceinfo")
 
-	dao, err := NewDaoWithRegionAndEndpoint(os.Getenv("SERVICETABLENAME"), os.Getenv("AWS_DEFAULT_REGION"), "http://localhost:8000")
+	dao, err := NewDaoWithRegionAndEndpoint(os.Getenv("SERVICETABLENAME"), os.Getenv("AWS_DEFAULT_REGION"), dynamoLocalEndpoint)
 	if err != nil {
 		t.Fatalf("failed test %#v", err)
 	}
@@ -135,14 +139,14 @@ func TestUpdateServiceIncorrectIdShouldReturnError(t *testing.T) {
 	if err == nil {
 		t.Fatalf("should return error %#v", result)
 	}
-	t.Logf("failed test %#v", err)
+	// t.Logf("failed test %#v", err)
 }
 
 func TestPostServiceSuccess(t *testing.T) {
 	os.Setenv("AWS_DEFAULT_REGION", "ap-northeast-1")
 	os.Setenv("SERVICETABLENAME", "swagger-dev-swagger-dynamo-serviceinfo")
 
-	dao, err := NewDaoWithRegionAndEndpoint(os.Getenv("SERVICETABLENAME"), os.Getenv("AWS_DEFAULT_REGION"), "http://localhost:8000")
+	dao, err := NewDaoWithRegionAndEndpoint(os.Getenv("SERVICETABLENAME"), os.Getenv("AWS_DEFAULT_REGION"), dynamoLocalEndpoint)
 	if err != nil {
 		t.Fatalf("failed test %#v", err)
 	}
@@ -168,7 +172,7 @@ func TestDeleteServiceSuccess(t *testing.T) {
 	os.Setenv("AWS_DEFAULT_REGION", "ap-northeast-1")
 	os.Setenv("SERVICETABLENAME", "swagger-dev-swagger-dynamo-serviceinfo")
 
-	dao, err := NewDaoWithRegionAndEndpoint(os.Getenv("SERVICETABLENAME"), os.Getenv("AWS_DEFAULT_REGION"), "http://localhost:8000")
+	dao, err := NewDaoWithRegionAndEndpoint(os.Getenv("SERVICETABLENAME"), os.Getenv("AWS_DEFAULT_REGION"), dynamoLocalEndpoint)
 	if err != nil {
 		t.Fatalf("failed test %#v", err)
 	}
