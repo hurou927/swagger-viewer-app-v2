@@ -59,6 +59,21 @@ custom:
             lastupdated:
               type: number
 
+      - name: UpdateVersionEntityRequest
+        contentType: "application/json"
+        schema:
+          required: 
+            - enable
+            - path
+            - tag
+          properties:
+            enable:
+              type: boolean
+            path:
+              type: string
+            tag:
+              type: string
+
   serverless-offline:
     port: 3027
 
@@ -145,7 +160,7 @@ functions:
     events:
       - http:
           path: services/{id}
-          method: put
+          method: patch
           cors: true
           request:
             parameters:
@@ -164,6 +179,27 @@ functions:
             parameters:
               paths:
                 id: true
+              
+  updateVersions:
+    handler: src/updateVersion/main.go
+    events:
+      - http:
+          path: versions/{id}/versions/{version}
+          method: patch
+          cors: true
+          reqValidatorName: BodyParameter
+          documentation:
+            summary: "Update Version Record"
+            description: "Update Service Record"
+            tags:
+              - Version
+            requestModels:
+              "application/json": UpdateVersionEntityRequest
+          request:
+            parameters:
+              paths:
+                id: true
+                version: true
 
 
 resources:
