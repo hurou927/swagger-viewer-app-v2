@@ -5,4 +5,5 @@ require (
 	github.com/aws/aws-sdk-go v1.16.31
 	github.com/aws/aws-sdk-go-v2 v0.7.0
 	github.com/google/uuid v1.1.0
+	gopkg.in/yaml.v2 v2.2.2
 )
