@@ -17,6 +17,7 @@ provider:
       SERVICETABLENAME: ${self:custom.serviceTableName}
       VERSIONTABLENAME: ${self:custom.versionTableName}
       LAMBDACACHE : true # NOTE! true is String => 'true'
+      BUKETNAME: swagger-repository-test
 
 plugins:
   - serverless-reqvalidator-plugin
@@ -72,6 +73,24 @@ custom:
             path:
               type: string
             tag:
+              type: string
+
+      - name: UploadVersionEntityRequest
+        contentType: "application/json"
+        schema:
+          required: 
+            - enable
+            - path
+            - tag
+            - contents
+          properties:
+            enable:
+              type: boolean
+            path:
+              type: string
+            tag:
+              type: string
+            contents:
               type: string
 
   serverless-offline:
@@ -200,6 +219,26 @@ functions:
               paths:
                 id: true
                 version: true
+
+  uploadSwagger:
+    handler: src/uploadVersion/main.go
+    events:
+      - http:
+          path: versions/{id}
+          method: put
+          cors: true
+          reqValidatorName: BodyParameter
+          documentation:
+            summary: "Upload Swagger Record"
+            description: "Upload Swagger Record"
+            tags:
+              - Version
+            requestModels:
+              "application/json": UploadVersionEntityRequest
+          request:
+            parameters:
+              paths:
+                id: true
 
 
 resources:

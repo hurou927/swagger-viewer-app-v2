@@ -270,15 +270,6 @@ func (this *versionRepositoryDaoImpl) UploadVersion(version VersionEntity, bucke
 		return nil, common.NewError(301, "dynamoDB marhsallist error", err)
 	}
 
-	// uploader := this.s3Uploader
-	// fmt.Println(bucket, key, contents)
-	// uploadResult, err := uploader.Upload(&s3manager.UploadInput{
-	// 	Bucket:      aws.String(bucket),
-	// 	Key:         aws.String(key),
-	// 	Body:        bytes.NewReader([]byte(contents)),
-	// 	ContentType: aws.String("application/text"),
-	// })
-
 	input := &s3.PutObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
