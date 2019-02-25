@@ -32,6 +32,7 @@ type swagger struct {
 }
 
 func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+
 	if versionInitError != nil {
 		return common.CreateErrorResponse(500, common.ErrorBody{
 			Error: common.ErrorElm{
@@ -51,6 +52,8 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		})
 	}
 
+	fmt.Printf("events, %+v\n", reqbody.Contents)
+
 	var fileFormat common.Format
 	if reqbody.Format == "yaml" || reqbody.Format == "yml" {
 		fileFormat = common.Yml
@@ -66,6 +69,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	}
 
 	swagger, err := common.ValidateSwagger(fileFormat, reqbody.Contents)
+	fmt.Printf("swagger %+v\n", swagger)
 	if err != nil {
 		return common.CreateErrorResponse(400, common.ErrorBody{
 			Error: common.ErrorElm{
@@ -75,15 +79,13 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		})
 	}
 
-	fmt.Printf("TODO: upload swagger: %+v\n", swagger)
-	fmt.Println("=====================================")
 	var ext string
 	if fileFormat == common.Yml {
 		ext = "json"
 	} else {
 		ext = "yml"
 	}
-	bucketName := os.Getenv("BUKCETNAME")
+	bucketName := os.Getenv("SWAGGER_BUCKET_NAME")
 	keyName := fmt.Sprintf("swagger/%s/%s_%d.%s", request.PathParameters["id"], swagger.Info.Version, time.Now().Unix(), ext)
 
 	requestEntity := versiondb.VersionEntity{

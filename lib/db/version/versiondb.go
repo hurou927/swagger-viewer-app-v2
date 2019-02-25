@@ -294,10 +294,10 @@ func (this *versionRepositoryDaoImpl) UploadVersion(version VersionEntity, bucke
 	result, err := this.dynamoClient.PutItemRequest(&dynamodb.PutItemInput{
 		TableName: aws.String(this.tableName),
 		Item:      item,
-		ExpressionAttributeNames: map[string]string{
-			"#id":      "id",
-			"#version": "version",
-		},
+		// ExpressionAttributeNames: map[string]string{
+		// 	"#id":      "id",
+		// 	"#version": "version",
+		// },
 		ReturnConsumedCapacity: dynamodb.ReturnConsumedCapacityTotal,
 	}).Send()
 

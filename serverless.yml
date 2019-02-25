@@ -11,13 +11,17 @@ provider:
       Action:
         - "dynamodb:*"
       Resource: '*'
+    - Effect: "Allow"
+      Action:
+        - "s3:PutObject"
+      Resource: '*'
   memorySize: 128
   versionFunctions: false
   environment:
       SERVICETABLENAME: ${self:custom.serviceTableName}
       VERSIONTABLENAME: ${self:custom.versionTableName}
       LAMBDACACHE : true # NOTE! true is String => 'true'
-      BUKETNAME: swagger-repository-test
+      SWAGGER_BUCKET_NAME: swagger-repository-test
 
 plugins:
   - serverless-reqvalidator-plugin
@@ -80,13 +84,13 @@ custom:
         schema:
           required: 
             - enable
-            - path
+            - format
             - tag
             - contents
           properties:
             enable:
               type: boolean
-            path:
+            format:
               type: string
             tag:
               type: string

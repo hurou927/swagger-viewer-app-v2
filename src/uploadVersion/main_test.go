@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"testing"
 
@@ -16,7 +17,7 @@ func TestHandlerSuccess(t *testing.T) {
 
 	os.Setenv("AWS_DEFAULT_REGION", "ap-northeast-1")
 	os.Setenv("VERSIONTABLENAME", "swagger-dev-swagger-dynamo-versioninfo")
-	os.Setenv("BUKCETNAME", "swagger-repository-test")
+	os.Setenv("SWAGGER_BUCKET_NAME", "swagger-repository-test")
 
 	versionDao, versionInitError = versiondb.NewDaoWithEndpoints(
 		os.Getenv("VERSIONTABLENAME"),
@@ -54,6 +55,7 @@ info:
 
 	var ctx context.Context
 	response, err := Handler(ctx, request)
+	fmt.Println(response, err)
 	if err != nil {
 		t.Fatalf("failed test %#v", err)
 	}
