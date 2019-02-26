@@ -1,0 +1,6 @@
+
+swagger: '2.0'
+info:
+  description: これはアパートに関するAPIです。
+  version: 0.0.1
+  title: アパートAPI

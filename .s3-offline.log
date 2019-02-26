@@ -1,0 +1,5 @@
+S3rver listening on localhost:4568
+[32minfo[39m: [S3rver] Stored object "swagger/524f25fe-b711-3ae8-b7b8-93fffaaeb4e0/0.0.1_1551100392.json" in bucket "swagger-repository-test" successfully
+[32minfo[39m: [S3rver] PUT /swagger-repository-test/swagger/524f25fe-b711-3ae8-b7b8-93fffaaeb4e0/0.0.1_1551100392.json 200 - - 12.216 ms
+[32minfo[39m: [S3rver] Stored object "swagger/524f25fe-b711-3ae8-b7b8-93fffaaeb4e0/0.0.1_1551100413.json" in bucket "swagger-repository-test" successfully
+[32minfo[39m: [S3rver] PUT /swagger-repository-test/swagger/524f25fe-b711-3ae8-b7b8-93fffaaeb4e0/0.0.1_1551100413.json 200 - - 2.153 ms

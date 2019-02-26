@@ -1,0 +1,10 @@
+Dynamodb Local Started, Visit: http://localhost:8027/shell
+Serverless: DynamoDB - created table swagger-dev-swagger-dynamo-serviceinfo
+Serverless: DynamoDB - created table swagger-dev-swagger-dynamo-versioninfo
+Seed running complete for table: swagger-dev-swagger-dynamo-serviceinfo
+Seed running complete for table: swagger-dev-swagger-dynamo-versioninfo
+Serverless: Starting Offline: dev/ap-northeast-1.
+
+Serverless: Warning: found unsupported runtime 'go1.x'
+
+Serverless: Offline listening on http://localhost:3027
