@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"os"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -16,9 +17,9 @@ var serviceDao servicedb.ServiceRepositoryDao
 var serviceInitError error
 
 type requestBody struct {
-	Servicename   string `json:"servicename" validate:"required"`
-	Latestversion string `json:"latestversion" validate:"required"`
-	Lastupdated   int64  `json:"lastupdated" validate:"required"`
+	Servicename string `json:"servicename" validate:"required"`
+	// Latestversion string `json:"latestversion" validate:"required"`
+	// Lastupdated   int64  `json:"lastupdated" validate:"required"`
 }
 
 func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -58,8 +59,8 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	requestEntity := servicedb.ServiceEntity{
 		Id:            id.String(),
 		Servicename:   reqbody.Servicename,
-		Latestversion: reqbody.Latestversion,
-		Lastupdated:   reqbody.Lastupdated,
+		Latestversion: "0.0.0",
+		Lastupdated:   time.Now().Unix() * 1000,
 	}
 
 	if _, err := serviceDao.CreateService(requestEntity); err != nil { //Todo: Error
@@ -71,7 +72,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		})
 	}
 
-	resp, err := common.CreateResponse(200, requestEntity)
+	resp, err := common.CreateResponse(201, requestEntity)
 
 	if err != nil {
 		return common.CreateErrorResponse(500, common.ErrorBody{
