@@ -4,12 +4,16 @@ service: ${file(config.yml):service}
 provider:
   name: aws
   region: ${file(config.yml):region}
-  runtime: nodejs8.10
+  runtime: go1.x
   stage: ${file(config.yml):stage}
   iamRoleStatements:
     - Effect: "Allow"
       Action:
         - "dynamodb:*"
+      Resource: '*'
+    - Effect: "Allow"
+      Action:
+        - "s3:PutObject"
       Resource: '*'
   memorySize: 128
   versionFunctions: false
@@ -17,8 +21,11 @@ provider:
       SERVICETABLENAME: ${self:custom.serviceTableName}
       VERSIONTABLENAME: ${self:custom.versionTableName}
       LAMBDACACHE : true # NOTE! true is String => 'true'
+      SWAGGER_BUCKET_NAME: swagger-repository-test
 
 plugins:
+  - serverless-reqvalidator-plugin
+  - serverless-aws-documentation
   - serverless-dynamodb-local
   - serverless-offline
   - serverless-go-build
@@ -29,9 +36,73 @@ frameworkVersion: ">=1.28.0 <2.0.0"
 custom:
   serviceTableName: ${self:service}-${self:provider.stage}-swagger-dynamo-serviceinfo
   versionTableName: ${self:service}-${self:provider.stage}-swagger-dynamo-versioninfo
+  documentation:
+    api:
+      info:
+        version: '1.0.0'
+        title: Swagger API
+        description: This is my API
+      tags:
+        -
+          name: Swagger
+          description: Service Management
+      
+    models:
+
+      - name: ServiceEntityRequest
+        contentType: "application/json"
+        schema:
+          required: 
+            - servicename
+            - latestversion
+            - lastupdated
+          properties:
+            servicename:
+              type: string
+            latestversion:
+              type: string
+            lastupdated:
+              type: number
+
+      - name: UpdateVersionEntityRequest
+        contentType: "application/json"
+        schema:
+          required: 
+            - enable
+            - path
+            - tag
+          properties:
+            enable:
+              type: boolean
+            path:
+              type: string
+            tag:
+              type: string
+
+      - name: UploadVersionEntityRequest
+        contentType: "application/json"
+        schema:
+          required: 
+            - enable
+            - format
+            - tag
+            - contents
+          properties:
+            enable:
+              type: boolean
+            format:
+              type: string
+            tag:
+              type: string
+            contents:
+              type: string
+
+  serverless-offline:
+    port: 3027
+
   dynamodb:
     start:
-      port: 8000
+      port: 8027
       inMemory: true
       migrate: true
       seed: true
@@ -49,35 +120,196 @@ package:
   individually: true
 
 functions:
-  # hello:
-  #   handler: hello/handler.go
-  #   events:
-  #     - http:
-  #         path: hello
-  #         method: get
-  # world:
-  #   handler: world/handler.go
-  #   events:
-  #     - http:
-  #         path: world
-  #         method: get
 
   getService:
-    handler: src/getService.go
+    handler: src/getService/main.go
     events:
       - http:
-          path: service/{id}
+          path: services/{id}
           method: get
+          cors: true
+          reqValidatorName: onlyParameter
+          request:
+            parameters:
+              paths:
+                id: true
+
+  getServiceList:
+    handler: src/getServiceList/main.go
+    events:
+      - http:
+          path: services
+          method: get
+          cors: true
+            
+  deleteService:
+    handler: src/deleteService/main.go
+    events:
+      - http:
+          path: services/{id}
+          method: delete
           cors: true
           request:
             parameters:
               paths:
                 id: true
 
+  createService:
+    handler: src/createService/main.go
+    events:
+      - http:
+          path: services
+          method: post
+          cors: true
+          reqValidatorName: onlyBody
+          # documentation:
+          #   summary: "Create Service Record"
+          #   description: "Create Service Record"
+          #   tags:
+          #     - Service
+          #   requestModels:
+          #     "application/json": ServiceEntity
+          documentation:
+            summary: "Register user"
+            description: "Registers new user"
+            tags:
+              - User
+            requestModels:
+              "application/json": ServiceEntityRequest
+            
+
+  updateService:
+    handler: src/updateService/main.go
+    events:
+      - http:
+          path: services/{id}
+          method: patch
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+
+  getAllVersions:
+    handler: src/getAllVersions/main.go
+    events:
+      - http:
+          path: versions/{id}
+          method: get
+          cors: true
+          reqValidatorName: onlyParameter
+          request:
+            parameters:
+              paths:
+                id: true
+              
+  updateVersions:
+    handler: src/updateVersion/main.go
+    events:
+      - http:
+          path: versions/{id}/versions/{version}
+          method: patch
+          cors: true
+          reqValidatorName: BodyParameter
+          documentation:
+            summary: "Update Version Record"
+            description: "Update Service Record"
+            tags:
+              - Version
+            requestModels:
+              "application/json": UpdateVersionEntityRequest
+          request:
+            parameters:
+              paths:
+                id: true
+                version: true
+
+  uploadSwagger:
+    handler: src/uploadVersion/main.go
+    events:
+      - http:
+          path: versions/{id}
+          method: put
+          cors: true
+          reqValidatorName: BodyParameter
+          documentation:
+            summary: "Upload Swagger Record"
+            description: "Upload Swagger Record"
+            tags:
+              - Version
+            requestModels:
+              "application/json": UploadVersionEntityRequest
+          request:
+            parameters:
+              paths:
+                id: true
 
 
 resources:
   Resources:
+    onlyBody:  
+      Type: "AWS::ApiGateway::RequestValidator"
+      Properties:
+        Name: 'only-body'
+        RestApiId: 
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: false
+    
+    onlyParameter:  
+      Type: "AWS::ApiGateway::RequestValidator"
+      Properties:
+        Name: 'only-parameter'
+        RestApiId: 
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: false
+        ValidateRequestParameters: true
+
+    BodyParameter:  
+      Type: "AWS::ApiGateway::RequestValidator"
+      Properties:
+        Name: 'body-and-parameter'
+        RestApiId: 
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: true
+
+
+    GatewayResponseDefault4XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "method.request.header.origin"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Credentials: "'true'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+    GatewayResponseACCESSDENIED:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "method.request.header.origin"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Credentials: "'true'"
+        ResponseType: ACCESS_DENIED
+        ResponseTemplates:
+          'application/json': |
+            {"error": $context.authorizer.authorizeError,"message":$context.error.messageString}
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+    GatewayResponseDefault5XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "method.request.header.origin"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Credentials: "'true'"
+        ResponseType: DEFAULT_5XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+
+
     ServiceInfoDynamoDB:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Retain

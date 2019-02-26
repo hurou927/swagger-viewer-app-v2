@@ -22,19 +22,21 @@ const versionTableName = `${config.service}-${config.stage}-swagger-dynamo-versi
 const serviceInfo = [{
     name: 'audit', 
     info: [
-        { version: '1.52.100', path: 'swagger/audit/swagger1_52_100.yaml' },
-        { version: '2.20.1', path: 'swagger/audit/swagger2_20_1.yaml' },
-        { version: '3.0.0', path: 'swagger/audit/swagger3_0_0.yaml' }
+        { version: '1.52.100', path: 'swagger/audit/swagger1_52_100.yaml', tag: 'test', enable: true },
+        { version: '2.20.1', path: 'swagger/audit/swagger2_20_1.yaml', tag: 'dev', enable: true },
+        { version: '3.0.0', path: 'swagger/audit/swagger3_0_0.yaml', tag: 'prod', enable: true },
+        { version: '1.0.0', path: 'swagger/audit/swagger1_0_0.yaml', tag: 'no', enable: false },
     ]},{
     name: 'auth', 
     info: [
-        { version: '0.0.1', path: 'swagger/auth/swagger0_0_1.yaml' },
-        { version: '0.0.2', path: 'swagger/auth/swagger0_0_2.yaml' },
-        { version: '1.0.0', path: 'swagger/auth/swagger1_0_0.yaml' }
+        { version: '0.0.1', path: 'swagger/auth/swagger0_0_1.yaml', tag: 'dev', enable: true },
+        { version: '0.0.2', path: 'swagger/auth/swagger0_0_2.yaml', tag: 'prod', enable: true },
+        { version: '1.0.0', path: 'swagger/auth/swagger1_0_0.yaml', tag: 'no', enable: true },
     ]},{
     name: 'ess', 
     info: [
-        { version: '2.0.0', path: 'swagger/ess/swagger2_0_0.yaml' }
+        { version: '2.0.0', path: 'swagger/ess/swagger2_0_0.yaml', tag: 'prod', enable: true },
+        { version: '1.0.0', path: 'swagger/ess/swagger1_0_0.yaml', tag: 'no', enable: false },
     ]}
 ];
 
@@ -70,7 +72,9 @@ const serviceInfo = [{
                             id: id,
                             version: ver.version,
                             path: ver.path,
-                            lastupdated: (new Date()).getTime()
+                            lastupdated: (new Date()).getTime(),
+                            enable: ver.enable,
+                            tag: ver.tag,
                         }
                     }
                 });

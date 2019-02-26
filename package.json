@@ -1,12 +1,21 @@
 {
+  "scripts": {
+    "showdb": "node scripts/showDynamoDBLocal.js",
+    "offline": "sls offline start > .sls-offline.log 2>&1 & npx s3rver -d .s3-local -p 4568 > .s3-offline.log 2>&1 &",
+    "deploy": "sls build && sls deploy",
+    "rm-offline": "sudo lsof -i:3027  -i:8027  -i:4568  -t | xargs -I {} kill -KILL {}"
+  },
   "devDependencies": {
     "aws-sdk": "^2.395.0",
+    "commander": "^2.19.0",
     "js-yaml": "^3.12.1",
     "log4js": "^4.0.2",
-    "serverless-dynamodb-local": "^0.2.36",
+    "serverless-aws-documentation": "^1.1.0",
+    "serverless-dynamodb-local": "0.2.35",
     "serverless-go-build": "^0.0.6",
-    "serverless-offline": "^4.2.1",
-    "uuid-by-string": "^2.0.1"
-  },
-  "dependencies": {}
+    "serverless-offline": "^4.3.0",
+    "serverless-reqvalidator-plugin": "^1.0.3",
+    "uuid-by-string": "^2.0.1",
+    "s3rver": "^2.2.8"
+  }
 }
