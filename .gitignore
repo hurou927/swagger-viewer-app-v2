@@ -1,6 +1,9 @@
 # Serverless directories
 .serverless
 .dynamodb
+.s3-local
+.s3-offline.log
+.sls-offline.log
 # golang output binary directory
 bin
 
