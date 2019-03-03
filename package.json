@@ -1,7 +1,7 @@
 {
   "scripts": {
     "showdb": "node scripts/showDynamoDBLocal.js",
-    "offline": "sls offline start > .sls-offline.log 2>&1 & npx s3rver -d .s3-local -p 4568 > .s3-offline.log 2>&1 &",
+    "offline": "sls offline start > .sls-offline.log 2>&1 & npx s3rver -d .s3-local -p 4568 > .s3-offline.log 2>&1;aws --endpoint http://localhost:4568 s3api create-bucket --bucket swagger-repository-test &",
     "deploy": "sls build && sls deploy",
     "rm-offline": "sudo lsof -i:3027  -i:8027  -i:4568  -t | xargs -I {} kill -KILL {}"
   },

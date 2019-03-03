@@ -15,15 +15,60 @@ import (
 var serviceDao servicedb.ServiceRepositoryDao
 var serviceInitError error
 
-func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+type requestBody struct {
+	Servicename   string `json:"servicename" validate:"required"`
+	Latestversion string `json:"latestversion" validate:"required"`
+	Lastupdated   int64  `json:"lastupdated" validate:"required"`
+}
 
-	// serviceDao, err := servicedb.NewDaoDefaultConfig(os.Getenv("SERVICETABLENAME"))
+func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
 	if serviceInitError != nil {
 		return common.CreateErrorResponse(500, common.ErrorBody{
 			Error: common.ErrorElm{
 				Code:    1500,
 				Message: "DynamoClientError",
+			},
+		})
+	}
+
+	var reqbody requestBody
+	if err := json.Unmarshal([]byte(request.Body), &reqbody); err != nil {
+		return common.CreateErrorResponse(500, common.ErrorBody{
+			Error: common.ErrorElm{
+				Code:    1500,
+				Message: "Internal Error",
+			},
+		})
+	}
+
+	updateService := servicedb.UpdateServiceEntity{}
+	var serviceId = request.PathParameters["id"]
+	updateService.Id = &serviceId
+
+	if reqbody.Servicename != "" {
+		updateService.Servicename = &reqbody.Servicename
+	}
+	if reqbody.Lastupdated != 0 {
+		updateService.Lastupdated = &reqbody.Lastupdated
+	}
+	if reqbody.Latestversion != "" {
+		updateService.Latestversion = &reqbody.Latestversion
+	}
+
+	if _, err := serviceDao.UpdateService(updateService); err != nil {
+		if err.(*common.Error).Code == 1002 {
+			return common.CreateErrorResponse(404, common.ErrorBody{
+				Error: common.ErrorElm{
+					Code:    10002,
+					Message: "ID does not exist",
+				},
+			})
+		}
+		return common.CreateErrorResponse(400, common.ErrorBody{
+			Error: common.ErrorElm{
+				Code:    1401,
+				Message: "Internal Error",
 			},
 		})
 	}

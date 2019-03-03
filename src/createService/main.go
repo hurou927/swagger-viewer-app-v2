@@ -64,6 +64,14 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	}
 
 	if _, err := serviceDao.CreateService(requestEntity); err != nil { //Todo: Error
+		if err.(*common.Error).Code == 1001 {
+			return common.CreateErrorResponse(400, common.ErrorBody{
+				Error: common.ErrorElm{
+					Code:    10001,
+					Message: "ID already exist",
+				},
+			})
+		}
 		return common.CreateErrorResponse(400, common.ErrorBody{
 			Error: common.ErrorElm{
 				Code:    1400,

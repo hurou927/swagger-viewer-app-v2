@@ -4,6 +4,7 @@
 .s3-local
 .s3-offline.log
 .sls-offline.log
+
 # golang output binary directory
 bin
 
@@ -25,5 +26,7 @@ vendor
 
 # node modules
 node_modules
+src/Authorizer/node_modules
 
 .DS_Store
+

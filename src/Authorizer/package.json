@@ -1,0 +1,7 @@
+{
+  "scripts": {},
+  "devDependencies": {},
+  "dependencies": {
+    "js-yaml": "^3.12.2"
+  }
+}

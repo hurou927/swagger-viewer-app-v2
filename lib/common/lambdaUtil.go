@@ -47,7 +47,7 @@ func CreateResponse(statusCode int, body interface{}) (events.APIGatewayProxyRes
 	json.HTMLEscape(&buf, bodybytes)
 
 	resp := events.APIGatewayProxyResponse{
-		StatusCode:      200,
+		StatusCode:      statusCode,
 		IsBase64Encoded: false,
 		Body:            buf.String(),
 		Headers: map[string]string{

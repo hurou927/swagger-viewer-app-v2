@@ -74,7 +74,7 @@ func NewDaoDefaultConfig(tableName string) (ServiceRepositoryDao, error) {
 	}, nil
 }
 
-// NewDaoDefaultConfig return DynamoDB Session
+// NewDaoWithRegion return DynamoDB Session
 func NewDaoWithRegion(tableName string, region string) (ServiceRepositoryDao, error) {
 	cfg, err := external.LoadDefaultAWSConfig()
 	cfg.Region = region
@@ -88,7 +88,7 @@ func NewDaoWithRegion(tableName string, region string) (ServiceRepositoryDao, er
 	}, nil
 }
 
-// NewDaoDefaultConfig return DynamoDB Session
+// NewDaoWithRegionAndEndpoint return DynamoDB Session
 // If you are using dynamodb local, use it.
 // example: dao, err := NewDaoWithRegionAndEndpoint("tablename", "ap-northeast-1", "http://localhost:8000")
 func NewDaoWithRegionAndEndpoint(tableName string, region string, endpoint string) (ServiceRepositoryDao, error) {
@@ -106,6 +106,7 @@ func NewDaoWithRegionAndEndpoint(tableName string, region string, endpoint strin
 	}, nil
 }
 
+// GetService gets a service info.
 func (this *serviceRepositoryDaoImpl) GetService(serviceId string) (*ServiceEntity, error) {
 	if this == nil {
 		return nil, common.NewError(100, "nil pointer receiver", nil)
@@ -134,6 +135,7 @@ func (this *serviceRepositoryDaoImpl) GetService(serviceId string) (*ServiceEnti
 	return &entity, nil
 }
 
+// GetServiceList get all service stored in db
 func (this *serviceRepositoryDaoImpl) GetServiceList() ([]ServiceEntity, error) {
 	if this == nil {
 		return nil, common.NewError(100, "nil pointer receiver", nil)
@@ -159,6 +161,7 @@ func (this *serviceRepositoryDaoImpl) GetServiceList() ([]ServiceEntity, error) 
 	return services, nil
 }
 
+// CreateService creates service
 func (this *serviceRepositoryDaoImpl) CreateService(service ServiceEntity) (*ServiceEntity, error) {
 	if this == nil {
 		return nil, common.NewError(100, "nil pointer receiver", nil)
@@ -196,6 +199,7 @@ func (this *serviceRepositoryDaoImpl) CreateService(service ServiceEntity) (*Ser
 	return &entity, nil // return old data. Usually, This value is nothing.
 }
 
+// UpdateService updates service info.
 func (this *serviceRepositoryDaoImpl) UpdateService(service UpdateServiceEntity) (*ServiceEntity, error) {
 	if this == nil {
 		return nil, common.NewError(100, "nil pointer receiver", nil)
@@ -252,7 +256,7 @@ func (this *serviceRepositoryDaoImpl) UpdateService(service UpdateServiceEntity)
 		if aerr, ok := err.(awserr.Error); ok {
 			switch aerr.Code() {
 			case dynamodb.ErrCodeConditionalCheckFailedException:
-				return nil, common.NewError(1000, "id already exists", aerr)
+				return nil, common.NewError(1002, "id does not exists", aerr)
 			default:
 				return nil, common.NewError(300, "dynamodb put error", aerr)
 			}
@@ -268,6 +272,7 @@ func (this *serviceRepositoryDaoImpl) UpdateService(service UpdateServiceEntity)
 	return &entity, nil
 }
 
+// DeleteService deletes service info
 func (this *serviceRepositoryDaoImpl) DeleteService(serviceId string) (*ServiceEntity, error) {
 	if this == nil {
 		return nil, common.NewError(100, "nil pointer receiver", nil)

@@ -1,0 +1,3 @@
+Authorization:
+  whitelist_ip:
+    - 222.229.48.80/32

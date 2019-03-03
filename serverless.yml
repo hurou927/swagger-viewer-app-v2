@@ -22,6 +22,11 @@ provider:
       VERSIONTABLENAME: ${self:custom.versionTableName}
       LAMBDACACHE : true # NOTE! true is String => 'true'
       SWAGGER_BUCKET_NAME: swagger-repository-test
+      AUTHORIZER_CONFIG: |
+        whitelist_ip:
+          - 222.229.48.80
+
+
 
 plugins:
   - serverless-reqvalidator-plugin
@@ -74,6 +79,12 @@ functions:
             parameters:
               paths:
                 id: true
+          authorizer:
+            name: authorizerFuncNodejs #authorizerFunc
+            resultTtlInSeconds: 0
+            identitySource: context.identity.sourceIp #,method.request.header.Authorization
+            # identityValidationExpression: someRegex
+            type: request
 
           documentation:
             summary: "get swagger info"
@@ -158,17 +169,34 @@ functions:
                   "application/json": ErrorResponse
             
 
-  # updateService:
-  #   handler: src/updateService/main.go
-  #   events:
-  #     - http:
-  #         path: services/{id}
-  #         method: patch
-  #         cors: true
-  #         request:
-  #           parameters:
-  #             paths:
-  #               id: true
+  updateService:
+    handler: src/updateService/main.go
+    events:
+      - http:
+          path: services/{id}
+          method: patch
+          cors: true
+          request:
+            parameters:
+              paths:
+                id: true
+          reqValidatorName: onlyBody
+          documentation:
+            summary: "update swagger"
+            description: "Registers new swagger"
+            tags:
+              - Swagger
+            requestModels:
+              "application/json": UpdateServiceEntityRequest
+            methodResponses:
+              -
+                statusCode: "204"
+                responseBody:
+                  description: "NO CONTENT"
+              -
+                statusCode: "400"
+                responseModels:
+                  "application/json": ErrorResponse
 
   getAllVersions:
     handler: src/getAllVersions/main.go
@@ -191,13 +219,13 @@ functions:
               "application/json": UpdateVersionEntityRequest
             methodResponses:
               -
-                statusCode: 200
+                statusCode: '200'
                 responseBody:
                   description: OK
                 responseModels:
                   "application/json": VersionEntityListResponse
               -
-                statusCode: 400
+                statusCode: '400'
                 responseModels:
                   "application/json": ErrorResponse
               
@@ -264,7 +292,19 @@ functions:
                 statusCode: "400"
                 responseModels:
                   "application/json": ErrorResponse
+  authorizerFunc:
+    handler: src/Authorizer/main.go
 
+  authorizerFuncNodejs:
+    handler: src/Authorizer/authorizer.handler
+    runtime: nodejs8.10
+    package:
+      exclude:
+        - ./**
+        - '!src/Authorizer/node_modules/**'
+      include:
+        - src/Authorizer/authorizer.js
+        - src/Authorizer/config.yaml
 
 resources:
   Resources:

@@ -6,6 +6,7 @@ import (
 )
 
 var dynamoLocalEndpoint string = "http://localhost:8027"
+var s3LocalEndpoint string = "http://localhost:4568"
 
 func TestGetServiceSuccess(t *testing.T) {
 	os.Setenv("AWS_DEFAULT_REGION", "ap-northeast-1")
@@ -22,7 +23,6 @@ func TestGetServiceSuccess(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed test %#v", err)
 	}
-	// fmt.Printf("%+v\n", versions)
 
 	for _, v := range versions {
 		if v.ID != serviceId {

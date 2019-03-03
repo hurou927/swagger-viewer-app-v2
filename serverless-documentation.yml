@@ -1,0 +1,161 @@
+custom:
+  documentation:
+    api:
+      info:
+        version: '1.0.0'
+        title: Swagger API
+        description: This is my API
+      tags:
+        -
+          name: Swagger
+          description: Service Management
+      
+    models:
+
+      - name: ServiceEntityRequest
+        contentType: "application/json"
+        schema:
+          required: 
+            - serviceName
+          properties:
+            serviceName:
+              type: string
+      
+      - name: ServiceEntity
+        contentType: "application/json"
+        schema:
+          required: 
+            - servicename
+            - latestversion
+            - lastupdated
+          properties:
+            servicename:
+              type: string
+            lastupdated:
+              type: string
+            latestversion:
+              type: string
+
+      - name: UpdateServiceEntityRequest
+        contentType: "application/json"
+        schema:
+          properties:
+            servicename:
+              type: string
+            lastupdated:
+              type: string
+            latestversion:
+              type: string
+
+
+      - name: ServiceEntityListResponse
+        contentType: "application/json"
+        schema:
+          properties:
+            Items:
+              type: array
+              items:
+                type: object
+                properties:
+                  servicename:
+                    type: string
+                  lastupdated:
+                    type: string
+                  latestversion:
+                    type: string
+            
+      
+      - name: ErrorResponse
+        contentType: "application/json"
+        schema:
+          required: 
+            - error
+          properties:
+            error:
+              type: object
+              properties:
+                code:
+                  type: number
+                message:
+                  type: string
+
+      - name: VersionEntity
+        contentType: "application/json"
+        schema:
+          required: 
+            - enable
+            - path
+            - tag
+            - version
+            - id
+            - lastupdated
+          properties:
+            id:
+              type: string
+            version:
+              type: string
+            enable:
+              type: boolean
+            path:
+              type: string
+            tag:
+              type: string
+            lastupdated:
+              type: number
+
+      - name: VersionEntityListResponse
+        contentType: "application/json"
+        schema:
+          properties:
+            Items:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  version:
+                    type: string
+                  enable:
+                    type: boolean
+                  path:
+                    type: string
+                  tag:
+                    type: string
+                  lastupdated:
+                    type: number
+
+
+      - name: UpdateVersionEntityRequest
+        contentType: "application/json"
+        schema:
+          required: 
+            - enable
+            - path
+            - tag
+          properties:
+            enable:
+              type: boolean
+            path:
+              type: string
+            tag:
+              type: string
+
+      - name: UploadVersionEntityRequest
+        contentType: "application/json"
+        schema:
+          required: 
+            - enable
+            - format
+            - tag
+            - contents
+          properties:
+            enable:
+              type: boolean
+            format:
+              type: string
+            tag:
+              type: string
+            contents:
+              type: string
+

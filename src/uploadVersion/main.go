@@ -115,7 +115,7 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		})
 	}
 
-	resp, err := common.CreateResponse(200, reqbody)
+	resp, err := common.CreateResponse(204, "no content")
 	fmt.Println(resp)
 	if err != nil {
 		return common.CreateErrorResponse(500, common.ErrorBody{

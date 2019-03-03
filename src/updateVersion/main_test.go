@@ -26,7 +26,7 @@ func TestHandlerSuccess(t *testing.T) {
 	queryParams := map[string]string{}
 	pathParams := map[string]string{
 		"id":      "524f25fe-b711-3ae8-b7b8-93fffaaeb4e0",
-		"version": "1.0.1",
+		"version": "1.0.0",
 	}
 
 	request, err := common.CreateProxyRequest(body, queryParams, pathParams)
