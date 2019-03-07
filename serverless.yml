@@ -25,6 +25,7 @@ provider:
       AUTHORIZER_CONFIG: |
         whitelist_ip:
           - 222.229.48.80
+  
 
 
 
@@ -42,6 +43,14 @@ custom:
   serviceTableName: ${self:service}-${self:provider.stage}-swagger-dynamo-serviceinfo
   versionTableName: ${self:service}-${self:provider.stage}-swagger-dynamo-versioninfo
   documentation: ${file(serverless-documentation.yml):custom.documentation}
+
+
+  authorizer:
+    name: authorizerFuncNodejs
+    resultTtlInSeconds: 1800
+    identitySource: context.identity.sourceIp #,method.request.header.Authorization
+    type: request
+
 
   serverless-offline:
     port: 3027
@@ -79,12 +88,7 @@ functions:
             parameters:
               paths:
                 id: true
-          authorizer:
-            name: authorizerFuncNodejs #authorizerFunc
-            resultTtlInSeconds: 0
-            identitySource: context.identity.sourceIp #,method.request.header.Authorization
-            # identityValidationExpression: someRegex
-            type: request
+          authorizer: ${self:custom.authorizer}
 
           documentation:
             summary: "get swagger info"
@@ -111,7 +115,7 @@ functions:
           path: services
           method: get
           cors: true
-
+          authorizer: ${self:custom.authorizer}
           documentation:
             summary: "get swagger info"
             description: "get swagger info"
@@ -148,6 +152,7 @@ functions:
           path: services
           method: post
           cors: true
+          authorizer: ${self:custom.authorizer}
           reqValidatorName: onlyBody
           documentation:
             summary: "create swagger"
@@ -176,6 +181,7 @@ functions:
           path: services/{id}
           method: patch
           cors: true
+          authorizer: ${self:custom.authorizer}
           request:
             parameters:
               paths:
@@ -205,6 +211,7 @@ functions:
           path: versions/{id}
           method: get
           cors: true
+          authorizer: ${self:custom.authorizer}
           reqValidatorName: onlyParameter
           request:
             parameters:
@@ -236,6 +243,7 @@ functions:
           path: versions/{id}/versions/{version}
           method: patch
           cors: true
+          authorizer: ${self:custom.authorizer}
           reqValidatorName: BodyParameter
           request:
             parameters:
@@ -269,6 +277,7 @@ functions:
           path: versions/{id}
           method: put
           cors: true
+          authorizer: ${self:custom.authorizer}
           reqValidatorName: BodyParameter
           request:
             parameters:
