@@ -46,6 +46,15 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		})
 	}
 
+	if servicedb.ValidateServiceName(reqbody.Servicename) == false {
+		return common.CreateErrorResponse(400, common.ErrorBody{
+			Error: common.ErrorElm{
+				Code:    1301,
+				Message: "Service Name must be url-safe(^[a-zA-Z0-9_-]*$)",
+			},
+		})
+	}
+
 	id, err := uuid.NewUUID()
 	if err != nil {
 		return common.CreateErrorResponse(500, common.ErrorBody{

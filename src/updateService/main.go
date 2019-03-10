@@ -16,9 +16,9 @@ var serviceDao servicedb.ServiceRepositoryDao
 var serviceInitError error
 
 type requestBody struct {
-	Servicename   string `json:"servicename" validate:"required"`
-	Latestversion string `json:"latestversion" validate:"required"`
-	Lastupdated   int64  `json:"lastupdated" validate:"required"`
+	Servicename string `json:"servicename" validate:"required"`
+	// Latestversion string `json:"latestversion" validate:"required"`
+	// Lastupdated   int64  `json:"lastupdated" validate:"required"`
 }
 
 func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -41,20 +41,29 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 			},
 		})
 	}
+	if servicedb.ValidateServiceName(reqbody.Servicename) == false {
+		return common.CreateErrorResponse(400, common.ErrorBody{
+			Error: common.ErrorElm{
+				Code:    1301,
+				Message: "Service Name must be url-safe(^[a-zA-Z0-9_-]*$)",
+			},
+		})
+	}
 
 	updateService := servicedb.UpdateServiceEntity{}
 	var serviceId = request.PathParameters["id"]
 	updateService.Id = &serviceId
+	updateService.Servicename = &reqbody.Servicename
 
-	if reqbody.Servicename != "" {
-		updateService.Servicename = &reqbody.Servicename
-	}
-	if reqbody.Lastupdated != 0 {
-		updateService.Lastupdated = &reqbody.Lastupdated
-	}
-	if reqbody.Latestversion != "" {
-		updateService.Latestversion = &reqbody.Latestversion
-	}
+	// if reqbody.Servicename != "" {
+	// 	updateService.Servicename = &reqbody.Servicename
+	// }
+	// if reqbody.Lastupdated != 0 {
+	// 	updateService.Lastupdated = &reqbody.Lastupdated
+	// }
+	// if reqbody.Latestversion != "" {
+	// 	updateService.Latestversion = &reqbody.Latestversion
+	// }
 
 	if _, err := serviceDao.UpdateService(updateService); err != nil {
 		if err.(*common.Error).Code == 1002 {

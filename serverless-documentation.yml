@@ -39,13 +39,15 @@ custom:
       - name: UpdateServiceEntityRequest
         contentType: "application/json"
         schema:
+          required: 
+            - servicename
           properties:
             servicename:
               type: string
-            lastupdated:
-              type: string
-            latestversion:
-              type: string
+            # lastupdated:
+            #   type: string
+            # latestversion:
+            #   type: string
 
 
       - name: ServiceEntityListResponse

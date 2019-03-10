@@ -25,7 +25,6 @@ var dynamoLocalEndpoint string = "http://localhost:8027"
 // 	}
 // 	t.Log(servicies)
 // }
-
 func TestGetServiceSuccess(t *testing.T) {
 	os.Setenv("AWS_DEFAULT_REGION", "ap-northeast-1")
 	os.Setenv("SERVICETABLENAME", "swagger-dev-swagger-dynamo-serviceinfo")

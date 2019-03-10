@@ -22,9 +22,9 @@ provider:
       VERSIONTABLENAME: ${self:custom.versionTableName}
       LAMBDACACHE : true # NOTE! true is String => 'true'
       SWAGGER_BUCKET_NAME: swagger-repository-test
-      AUTHORIZER_CONFIG: |
-        whitelist_ip:
-          - 222.229.48.80
+      # AUTHORIZER_CONFIG: |
+      #   whitelist_ip:
+      #     - 222.229.48.80
   
 
 
@@ -47,7 +47,7 @@ custom:
 
   authorizer:
     name: authorizerFuncNodejs
-    resultTtlInSeconds: 1800
+    resultTtlInSeconds: 0 #1800
     identitySource: context.identity.sourceIp #,method.request.header.Authorization
     type: request
 
@@ -189,7 +189,7 @@ functions:
           reqValidatorName: onlyBody
           documentation:
             summary: "update swagger"
-            description: "Registers new swagger"
+            description: "Update swagger"
             tags:
               - Swagger
             requestModels:
@@ -301,8 +301,8 @@ functions:
                 statusCode: "400"
                 responseModels:
                   "application/json": ErrorResponse
-  authorizerFunc:
-    handler: src/Authorizer/main.go
+  # authorizerFunc:
+  #   handler: src/Authorizer/main.go
 
   authorizerFuncNodejs:
     handler: src/Authorizer/authorizer.handler

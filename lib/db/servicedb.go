@@ -1,6 +1,8 @@
 package servicedb
 
 import (
+	"regexp"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/awserr"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
@@ -9,6 +11,10 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/expression"
 	"github.com/swagger-viewer/swagger-viewer-app-v2/lib/common"
 )
+
+func ValidateServiceName(serviceName string) bool {
+	return regexp.MustCompile(`^[a-zA-Z0-9_-]*$`).MatchString(serviceName)
+}
 
 // ServiceEntity provides Service DB Record Contents
 type ServiceEntity struct {
