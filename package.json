@@ -6,7 +6,7 @@
     "rm-offline": "sudo lsof -i:3027  -i:8027  -i:4568  -t | xargs -I {} kill -KILL {}"
   },
   "devDependencies": {
-    "aws-sdk": "^2.395.0",
+    "aws-sdk": "^2.814.0",
     "commander": "^2.19.0",
     "js-yaml": "^3.12.1",
     "log4js": "^4.0.2",
